@@ -1,0 +1,13 @@
+export interface Case{id:number;case_number:string;title:string;investigator:string;status:string;classification:string;created_at:string}
+export interface Evidence{id:number;evidence_id:string;name:string;type:string;size_bytes:number;mime_type:string;sha256:string;description:string;status:"VERIFIED"|"MISMATCH"|"PENDING";risk:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";created_meta:string;modified_meta:string;acquired_at:string}
+export interface Artifact{id:number;artifact_id:string;evidence_id:number|null;source:string;timestamp:string;type:string;description:string;risk:string}
+export interface TimelineEvent{id:number;event_id:string;timestamp:string;event:string;source:string;category:string;evidence_id:number|null;artifact_id:number|null;risk:string}
+export interface Finding{id:number;finding_id:string;rule_name:string;title:string;severity:"LOW"|"MEDIUM"|"HIGH"|"CRITICAL";confidence:number;points:number;evidence_id:number|null;timeline_event_id:number|null;artifact_id:number|null;reason:string;recommended_step:string;timestamp:string}
+export interface Investigation{id:number;investigation_id:string;title:string;status:string;priority:string;assigned_to:string;linked_finding_ids:string;created_at:string}
+export interface Note{id:number;author:string;content:string;created_at:string}
+export interface GraphNodeData{node_key:string;node_type:string;label:string;description:string;risk:string;related_evidence_id:number|null;timestamp:string|null}
+export interface GraphEdgeData{source_key:string;target_key:string;relation_type:string}
+export interface RiskFactor{label:string;points:number;severity:string}
+export interface RiskResponse{score:number;level:string;factors:RiskFactor[]}
+export interface DashboardSummary{case:Case|null;evidence_items:number;artifacts_count:number;suspicious_events:number;critical_findings:number;integrity_status:string;risk:RiskResponse;severity_distribution:Record<string,number>;evidence_type_distribution:Record<string,number>;findings_over_time:{time:string;severity:string}[];timeline_density:{hour:string;count:number}[];investigation_status_distribution:Record<string,number>;recent_activity:{time:string;action:string;details:string}[]}
+export interface AIActionResponse{observed:string[];analysis:string[];recommendation:string[];provider:string;generated_at:string}
