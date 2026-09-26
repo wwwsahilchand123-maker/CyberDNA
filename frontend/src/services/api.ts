@@ -1,0 +1,24 @@
+import axios from "axios";
+import type { Case, Evidence, Artifact, TimelineEvent, Finding, Investigation, Note, GraphNodeData, GraphEdgeData, DashboardSummary, AIActionResponse } from "../types";
+
+const api = axios.create({baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000", timeout: 30000});
+export default api;
+export const loadDemoInvestigation=()=>api.post<Case>("/api/demo/load").then(r=>r.data);
+export const getDashboardSummary=()=>api.get<DashboardSummary>("/api/dashboard/summary").then(r=>r.data);
+export const getEvidence=(params?:Record<string,string>)=>api.get<Evidence[]>("/api/evidence",{params}).then(r=>r.data);
+export const uploadEvidence=(file:File,evidence_type:string,description:string,onProgress?:(pct:number)=>void)=>{const form=new FormData();form.append("file",file);form.append("evidence_type",evidence_type);form.append("description",description);return api.post<Evidence>("/api/evidence/upload",form,{headers:{"Content-Type":"multipart/form-data"},onUploadProgress:e=>{if(onProgress&&e.total)onProgress(Math.round(e.loaded*100/e.total));}}).then(r=>r.data);};
+export const verifyEvidence=(id:number)=>api.post(`/api/evidence/${id}/verify`).then(r=>r.data);
+export const getArtifacts=(params?:Record<string,string>)=>api.get<Artifact[]>("/api/artifacts",{params}).then(r=>r.data);
+export const getTimeline=(params?:Record<string,string>)=>api.get<TimelineEvent[]>("/api/timeline",{params}).then(r=>r.data);
+export const getFindings=(params?:Record<string,string>)=>api.get<Finding[]>("/api/findings",{params}).then(r=>r.data);
+export const getInvestigations=()=>api.get<Investigation[]>("/api/investigations").then(r=>r.data);
+export const createInvestigation=(payload:{title:string;priority:string;linked_finding_ids:string[]})=>api.post<Investigation>("/api/investigations",payload).then(r=>r.data);
+export const updateInvestigation=(id:number,payload:{status?:string;priority?:string})=>api.patch<Investigation>(`/api/investigations/${id}`,payload).then(r=>r.data);
+export const getNotes=(id:number)=>api.get<Note[]>(`/api/investigations/${id}/notes`).then(r=>r.data);
+export const addNote=(id:number,content:string,author="Agent A. Rao")=>api.post<Note>(`/api/investigations/${id}/notes`,{content,author}).then(r=>r.data);
+export const getGraph=()=>api.get<{nodes:GraphNodeData[];edges:GraphEdgeData[]}>("/api/graph").then(r=>r.data);
+export const runAIAction=(action:string,payload:Record<string,any>={})=>api.post<AIActionResponse>("/api/ai/analyze",{action,payload}).then(r=>r.data);
+export const generateReport=()=>api.post<{report_id:number;file_path:string}>("/api/reports/generate").then(r=>r.data);
+export const listReports=()=>api.get("/api/reports").then(r=>r.data);
+export const downloadReportUrl=(id:number)=>`${api.defaults.baseURL}/api/reports/${id}/download`;
+export const globalSearch=(q:string)=>api.get("/api/search",{params:{q}}).then(r=>r.data);
